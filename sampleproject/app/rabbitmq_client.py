@@ -51,6 +51,13 @@ RABBITMQ_USER = os.getenv("RABBITMQ_USER", "guest")
 RABBITMQ_PASS = os.getenv("RABBITMQ_PASS", "guest")
 RABBITMQ_QUEUE = os.getenv("RABBITMQ_QUEUE", "sample_queue")
 
+# credentials = pika.PlainCredentials(RABBITMQ_USER, RABBITMQ_PASS)
+# parameters = pika.ConnectionParameters(
+#     host=RABBITMQ_HOST,
+#     port=RABBITMQ_PORT,
+#     credentials=credentials
+# )
+
 credentials = pika.PlainCredentials(RABBITMQ_USER, RABBITMQ_PASS)
 parameters = pika.ConnectionParameters(
     host=RABBITMQ_HOST,

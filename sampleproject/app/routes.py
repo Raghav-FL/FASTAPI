@@ -7,7 +7,7 @@ from .postgres_db import database
 import os
 from .rabbitmq_client import publish_message_to_rabbitmq
 from .rabbitmq_client import consume_one_message_from_rabbitmq
-
+from .rabbitmq_client import parameters
 router = APIRouter()
 import pika
 import requests
