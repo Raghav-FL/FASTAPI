@@ -9,6 +9,8 @@ from .rabbitmq_client import publish_message_to_rabbitmq
 from .rabbitmq_client import consume_one_message_from_rabbitmq
 
 router = APIRouter()
+import pika
+import requests
 
 @router.post("/mongo-insert", summary="Insert a document into MongoDB and Redis")
 async def insert_item(item: SampleItem):
@@ -96,3 +98,40 @@ async def consume_message():
             raise HTTPException(status_code=404, detail="No messages in queue")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error consuming message: {str(e)}")
+
+
+
+
+@router.get("/rabbitmq-health", summary="Check RabbitMQ connection health")
+def rabbitmq_health_check():
+    try:
+        connection = pika.BlockingConnection(parameters)
+        if connection.is_open:
+            connection.close()
+            return {"status": "healthy", "message": "Connected to RabbitMQ successfully"}
+        else:
+            return {"status": "unhealthy", "message": "Connection to RabbitMQ is not open"}
+    except Exception as e:
+        raise HTTPException(status_code=503, detail=f"RabbitMQ connection failed: {str(e)}")
+
+
+@router.get("/rabbitmq-logs", summary="Fetch recent RabbitMQ logs (via management API)")
+def rabbitmq_logs():
+    mgmt_host = os.getenv("RABBITMQ_MANAGEMENT_HOST", "localhost")
+    mgmt_port = int(os.getenv("RABBITMQ_MANAGEMENT_PORT", 15672))
+    mgmt_user = os.getenv("RABBITMQ_MANAGEMENT_USER", "guest")
+    mgmt_pass = os.getenv("RABBITMQ_MANAGEMENT_PASS", "guest")
+
+    url = f"http://{mgmt_host}:{mgmt_port}/api/logs"  # Note: RabbitMQ management API does not provide logs directly
+    # The API doesn't provide logs directly, but you can get server info or events.
+
+    # For demonstration, let's get overview info (health, nodes, queues)
+    overview_url = f"http://{mgmt_host}:{mgmt_port}/api/overview"
+
+    try:
+        response = requests.get(overview_url, auth=(mgmt_user, mgmt_pass), timeout=5)
+        response.raise_for_status()
+        data = response.json()
+        return {"overview": data}
+    except Exception as e:
+        raise HTTPException(status_code=503, detail=f"Failed to fetch RabbitMQ overview: {str(e)}")
