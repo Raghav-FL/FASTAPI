@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+motor
+redis
+python-dotenv
+databases[postgresql]
+psycopg2-binary
+pika
